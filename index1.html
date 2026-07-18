@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For Mani ❤️</title>
+    <!-- Premium Apple Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #D4AF37;
+            --soft-gold: #e5c76b;
+            --rose-gold: #b76e79;
+            --champagne: #F7E7CE;
+            --warm-white: #FFFCF5;
+            --cream: #FFFDD0;
+            --apple-font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            background-color: #000;
+            color: var(--warm-white);
+            font-family: var(--apple-font);
+            overflow-x: hidden;
+            height: 100%;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* --- PRELOADER / INTRO --- */
+        #intro-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 2.5s ease, visibility 2.5s;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .intro-text {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 2s ease;
+            margin-bottom: 20px;
+        }
+
+        .intro-text.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .intro-title {
+            font-size: 2.5rem;
+            font-weight: 200;
+            letter-spacing: 0.2em;
+            background: linear-gradient(to right, #fff, var(--champagne));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .intro-sub {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 300;
+            letter-spacing: 0.1em;
+        }
+
+        .begin-btn {
+            margin-top: 40px;
+            padding: 16px 48px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(15px);
+            color: #fff;
+            border-radius: 40px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            letter-spacing: 0.3em;
+            opacity: 0;
+            transition: all 0.8s ease;
+        }
+
+        .begin-btn.visible { opacity: 1; }
+        .begin-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--gold);
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.2);
+        }
+
+        /* --- BACKGROUND ENGINE --- */
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .sky-gradient {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background: linear-gradient(to bottom, #1a2a6c, #b21f1f, #fdbb2d);
+            background-size: 100% 400%;
+            transition: background-position 3s ease;
+        }
+
+        .vignette {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, transparent 30%, rgba(0,0,0,0.5) 100%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* --- CONTENT --- */
+        .story-container {
+            position: relative;
+            z-index: 10;
+            display: none; /* Shown after BEGIN */
+        }
+
+        section {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 2s cubic-bezier(0.215, 0.61, 0.355, 1);
+        }
+
+        section.in-view {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        h2 {
+            font-weight: 200;
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            letter-spacing: -0.02em;
+            margin-bottom: 20px;
+        }
+
+        p {
+            font-size: clamp(1.1rem, 3vw, 1.6rem);
+            font-weight: 300;
+            line-height: 1.6;
+            color: rgba(255, 253, 245, 0.85);
+            max-width: 800px;
+        }
+
+        .gold-text {
+            color: var(--gold);
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+        }
+
+        /* Glass Card */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 60px 40px;
+            border-radius: 40px;
+            max-width: 700px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+        }
+
+        .glass-card h3 {
+            font-size: 2rem;
+            font-weight: 300;
+            margin-bottom: 30px;
+            color: var(--gold);
+        }
+
+        .card-line {
+            margin: 15px 0;
+            font-size: 1.2rem;
+            opacity: 0;
+            transform: translateX(-10px);
+            transition: all 1s ease;
+        }
+
+        .in-view .card-line {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* Signature */
+        .signature {
+            margin-top: 40px;
+            font-family: var(--apple-font);
+        }
+
+        .signature .name {
+            font-size: 2.5rem;
+            color: var(--gold);
+            margin-top: 10px;
+        }
+
+        .scroll-hint {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            letter-spacing: 0.4em;
+            text-transform: uppercase;
+            opacity: 0.5;
+            animation: pulse 3s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.2; transform: translate(-50%, 0); }
+            50% { opacity: 0.8; transform: translate(-50%, -10px); }
+        }
+
+        @media (max-width: 768px) {
+            section { padding: 20px; }
+            .glass-card { padding: 40px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Intro / Loading -->
+    <div id="intro-overlay">
+        <div class="intro-text" id="t1"><h1 class="intro-title">For Mani ❤️</h1></div>
+        <div class="intro-text" id="t2"><p class="intro-sub">My first home. My greatest strength. My forever inspiration.</p></div>
+        <div class="intro-text" id="t3"><p class="intro-sub">This is not just a website. It is a thank you.</p></div>
+        <button class="begin-btn" id="beginBtn" onclick="startStory()">BEGIN</button>
+    </div>
+
+    <!-- Background Layers -->
+    <div class="sky-gradient" id="sky"></div>
+    <canvas id="bg-canvas"></canvas>
+    <div class="vignette"></div>
+
+    <!-- Audio (Piano) -->
+    <audio id="audioTrack" loop>
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-15.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Main Content -->
+    <div class="story-container" id="story">
+        
+        <section id="s1">
+            <h2>Hi Amma ❤️</h2>
+            <p>Today, I don't want to ask you for anything.</p>
+            <p>I only want to say <span class="gold-text">Thank You.</span></p>
+        </section>
+
+        <section id="s2">
+            <p>Thank you for every sleepless night.</p>
+            <p>For every prayer.</p>
+            <p>For every sacrifice you made.</p>
+            <p class="gold-text">For every smile you gave me <br> even when life was difficult.</p>
+        </section>
+
+        <section id="s3">
+            <div class="glass-card">
+                <h3>You Are My Strength</h3>
+                <p class="card-line" style="transition-delay: 0.2s;">When I was weak, you gave me courage.</p>
+                <p class="card-line" style="transition-delay: 0.4s;">When I failed, you believed in me.</p>
+                <p class="card-line" style="transition-delay: 0.6s;">When I cried, you stood beside me.</p>
+                <p class="card-line" style="transition-delay: 0.8s;">When I smiled, you smiled even brighter.</p>
+            </div>
+        </section>
+
+        <section id="s4">
+            <p>People say home is a place.</p>
+            <h2>For me...</h2>
+            <p>Home has always been</p>
+            <h2 class="gold-text">where you are.</h2>
+        </section>
+
+        <section id="s5">
+            <p>No matter how old I become...</p>
+            <p>No matter where life takes me...</p>
+            <h2 style="font-size: 2.5rem;">I will always be your little boy.</h2>
+            <p>Thank you for making me the person I am today.</p>
+            <p class="gold-text" style="font-size: 2rem;">I love you more than words can describe. ❤️</p>
+        </section>
+
+        <section id="s6">
+            <p>To the strongest woman I know...</p>
+            <p>To the kindest heart I know...</p>
+            <p>To the person who taught me what love truly means...</p>
+            <h2 class="gold-text">Thank you, Amma.</h2>
+            <p>I promise I will always try to make you proud.</p>
+            <div class="signature">
+                <p>Love,</p>
+                <p class="name">Your Son, Manoj ❤️</p>
+            </div>
+        </section>
+
+        <div class="scroll-hint">Scroll Slowly</div>
+    </div>
+
+    <script>
+        // --- TEXT SEQUENCE ---
+        window.onload = () => {
+            setTimeout(() => document.getElementById('t1').classList.add('visible'), 1000);
+            setTimeout(() => document.getElementById('t2').classList.add('visible'), 3000);
+            setTimeout(() => document.getElementById('t3').classList.add('visible'), 5000);
+            setTimeout(() => document.getElementById('beginBtn').classList.add('visible'), 7000);
+        };
+
+        function startStory() {
+            document.getElementById('intro-overlay').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('intro-overlay').style.visibility = 'hidden';
+                document.getElementById('story').style.display = 'block';
+                document.getElementById('audioTrack').play();
+                initCanvas();
+            }, 2500);
+        }
+
+        // --- CANVAS ENGINE ---
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let width, height, particles = [], petals = [], rays = [];
+
+        function initCanvas() {
+            resize();
+            createElements();
+            animate();
+        }
+
+        function resize() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+        }
+
+        class Particle {
+            constructor() { this.reset(); }
+            reset() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.size = Math.random() * 2;
+                this.speed = Math.random() * 0.5 + 0.1;
+                this.opacity = Math.random() * 0.5;
+            }
+            update() {
+                this.y -= this.speed;
+                if (this.y < 0) this.reset();
+            }
+            draw() {
+                ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        class Petal {
+            constructor() { this.reset(); }
+            reset() {
+                this.x = Math.random() * width;
+                this.y = -20;
+                this.size = Math.random() * 6 + 4;
+                this.speedX = Math.random() * 1 - 0.5;
+                this.speedY = Math.random() * 1 + 0.5;
+                this.angle = Math.random() * Math.PI * 2;
+            }
+            update() {
+                this.x += this.speedX + Math.sin(this.angle) * 0.5;
+                this.y += this.speedY;
+                this.angle += 0.01;
+                if (this.y > height) this.reset();
+            }
+            draw() {
+                ctx.fillStyle = `rgba(212, 175, 55, 0.2)`;
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.angle);
+                ctx.beginPath();
+                ctx.ellipse(0, 0, this.size, this.size / 2, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        function createElements() {
+            for (let i = 0; i < 120; i++) particles.push(new Particle());
+            for (let i = 0; i < 25; i++) petals.push(new Petal());
+            for (let i = 0; i < 10; i++) {
+                rays.push({
+                    angle: (Math.random() * 40 + 70) * (Math.PI / 180),
+                    opacity: Math.random() * 0.15
+                });
+            }
+        }
+
+        function drawGodRays() {
+            const centerX = width * 0.8;
+            const centerY = -100;
+            rays.forEach(ray => {
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                const x1 = centerX + Math.cos(ray.angle - 0.15) * height * 2;
+                const y1 = centerY + Math.sin(ray.angle - 0.15) * height * 2;
+                const x2 = centerX + Math.cos(ray.angle + 0.15) * height * 2;
+                const y2 = centerY + Math.sin(ray.angle + 0.15) * height * 2;
+                const grad = ctx.createLinearGradient(centerX, centerY, x1, y1);
+                grad.addColorStop(0, `rgba(255, 240, 200, ${ray.opacity})`);
+                grad.addColorStop(1, 'transparent');
+                ctx.fillStyle = grad;
+                ctx.lineTo(x1, y1);
+                ctx.lineTo(x2, y2);
+                ctx.fill();
+            });
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            drawGodRays();
+            particles.forEach(p => { p.update(); p.draw(); });
+            petals.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animate);
+        }
+
+        // --- INTERSECTION OBSERVER (SCROLL ANIMATIONS) ---
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('in-view');
+                    updateBackground(entry.target.id);
+                }
+            });
+        }, { threshold: 0.6 });
+
+        document.querySelectorAll('section').forEach(s => observer.observe(s));
+
+        function updateBackground(id) {
+            const sky = document.getElementById('sky');
+            if (id === 's1') sky.style.backgroundPosition = '0% 0%';
+            if (id === 's3') sky.style.backgroundPosition = '0% 50%';
+            if (id === 's5' || id === 's6') {
+                sky.style.backgroundPosition = '0% 100%';
+                // Fade music slightly at the end
+                document.getElementById('audioTrack').volume = 0.3;
+            }
+        }
+
+        window.addEventListener('resize', resize);
+    </script>
+</body>
+</html>
